@@ -7,7 +7,7 @@
 # step 1: copy the folder vasp.5.3 and the folder vasp.5.lib in the same folder as this script
 # step 2: compile vasp.5.lib
 # step 3: create and revise makefile in vasp.5.3 so that vasp.5.3 can be compiled successfully (no need to compile)
-# step 4: run this patch: bash vasp-kp.5.3-patch-1.0.2.sh
+# step 4: run this patch: bash vasp-kp.5.3-patch-1.0.1.sh
 # After this steps, wait a few miniutes and then if "Finishing installing vasp-kp!" is shown on the shell
 # then the compile of vasp-kp is compiled successfully.
 ############################################################################################################
