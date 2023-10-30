@@ -9,7 +9,7 @@
 # step 3: create and revise makefile in vasp.5.3 so that vasp.5.3 can be compiled successfully (no need to compile)
 # step 4: run this patch: bash vasp-kp.5.3-patch-1.0.1.sh
 # After this steps, wait a few miniutes and then if "Finishing installing vasp-kp!" is shown on the shell
-# then the compile of vasp-kp is compiled successfully.
+# then vasp-kp is compiled successfully.
 ############################################################################################################
 
 # begin
