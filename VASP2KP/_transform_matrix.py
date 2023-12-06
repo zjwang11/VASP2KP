@@ -5,7 +5,7 @@ Last modified on Wedn Dec 6 14:45:00 2023
 
 @author: Sheng Zhang, Institute of Physics, Chinese Academy of Sciences
 
-Calculate the similarity transformation matrix between two corepresentations
+Calculate the transformation matrix between two corepresentations
 """
 
 #import copy
