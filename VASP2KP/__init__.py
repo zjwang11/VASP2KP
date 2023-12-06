@@ -5,7 +5,7 @@ Last modified on Wedn Dec 6 14:45:00 2023
 
 @author: Sheng Zhang, Institute of Physics, Chinese Academy of Sciences
 
-Initial file of VASP2KP
+Initial python source file of VASP2KP
 """
 
 __version__ = '1.0.1'
