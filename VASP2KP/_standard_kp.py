@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Aug 20 19:44:07 2023
-Last modified on Wedn Dec 6 14:45:00 2023 
+Last modified on Wedn Dec 6 14:45:00 2023
 
 @author: Sheng Zhang, Institute of Physics, Chinese Academy of Sciences
 
@@ -1420,12 +1420,13 @@ def get_Zeeman(Symmetry,msg_num,kvec,G_4c4,order = 0,print_flag = 2,log = 0):
     if print_flag != 0:
         print("Zeeman\'s coupling")
         print('==========  Result of Zeeman\'s coupling  ==========')
+        print('mu_B/2*',end='')
         print(sum_kpmodel_g)
         print("Parameters:")
         
         # write to a .out file or print to screen
         for i in range(coe_g_num):
-            coe_g[i][0]=round(coe_g[i][0].real,4)
+            coe_g[i][0]=round(coe_g[i][0].real,4)*2
             print(coe_g_sym[i],"=",coe_g[i][0].real,";")
             
         error_print = "{:.2e}".format(error)
@@ -1475,9 +1476,9 @@ def get_Zeeman(Symmetry,msg_num,kvec,G_4c4,order = 0,print_flag = 2,log = 0):
                     
                     texfile.write("\\begin{dmath}\n")
                     #texfile.write("\\noindent ")
-                    #texfile.write("$ H^{Z}_{"+str(i+1)+str(j+1)+"}/\\mu_B = "+ele_string+" $;\n\n~\\\\\n\n")
+                    #texfile.write("$ H^{Z}_{"+str(i+1)+str(j+1)+"}/(\\mu_B/2) = "+ele_string+" $;\n\n~\\\\\n\n")
                     
-                    texfile.write("\tH^{Z}_{"+str(i+1)+str(j+1)+"}/\\mu_B = "+ele_string+"\n")
+                    texfile.write("\tH^{Z}_{"+str(i+1)+str(j+1)+"}/(\\mu_B/2) = "+ele_string+"\n")
                     texfile.write("\\end{dmath}\n\n")
             
             texfile.write("\\end{dgroup*}\n")
