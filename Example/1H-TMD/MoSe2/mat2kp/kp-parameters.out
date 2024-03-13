@@ -1,0 +1,13 @@
+kp Hamiltonian
+==========  Result of kp Hamiltonian  ==========
+Matrix([[a1 + a2 + c1*(kx**2 + ky**2) + c2*(kx**2 + ky**2) + c4*kz**2 + c5*kz**2, c3*kz*(kx*(3 - sqrt(3)*I) - ky*(sqrt(3) + 3*I))/3], [c3*kz*(kx*(3 + sqrt(3)*I) - ky*(sqrt(3) - 3*I))/3, a1 - a2 + c1*(kx**2 + ky**2) - c2*(kx**2 + ky**2) + c4*kz**2 - c5*kz**2]])
+Parameters:
+a1 = -2.9261 ;
+a2 = -0.0921 ;
+c1 = -3.8886 ;
+c2 = 0.4677 ;
+c3 = -0.0105 ;
+c4 = 0.96 ;
+c5 = 0.0173 ;
+Error of the linear least square method: 6.15e-07
+Sum of absolute values of numerical zero elements: 3.51e-03

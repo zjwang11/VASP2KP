@@ -1,0 +1,32 @@
+==================================================
+Begin finding similarity transformation
+
+
+ Begin conjudge
+==================================================
+The tolerence is set to be 0.0001
+No need to start unitaryizing procedure!
+End
+==================================================
+End finding similarity transformation
+==================================================
+
+
+
+
+==================================================
+
+==========  Result of Unitary similarity transformation matrix  ==========
+Unitary similarity transformation matrix:
+Matrix([[0.29132205647719 + 0.956625035951862*I, 0], [0, 0.987353558689713 - 0.158533750800134*I]])
+
+
+Error:
+error for unitaryizing: 0.0
+error for C3z: 4.03850556385255e-7
+error for Mz: 1.66533453693773e-16
+error for MxT: 1.06533495054561e-7
+
+
+
+

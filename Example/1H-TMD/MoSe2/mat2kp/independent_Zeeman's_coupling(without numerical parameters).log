@@ -1,0 +1,44 @@
+
+Print Zeeman's coupling results:
+==========  Result of Zeeman's coupling  ==========
+Number of independent kp models: 3
+-----------------------------------------------------
+1-th kp model:
+Matrix([[0, Bx - sqrt(3)*I*Bx/3 - sqrt(3)*By/3 - I*By], [Bx + sqrt(3)*I*Bx/3 - sqrt(3)*By/3 + I*By, 0]])
+Basis vector: [0, 1, sqrt(3)/3, 0, 0, -sqrt(3)/3, 1, 0, 0, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+Bx
+By
+
+Matrix basis:
+Symbol: s_1 + sqrt(3)/3* s_2   Expression: Matrix([[0, 1 - sqrt(3)*I/3], [1 + sqrt(3)*I/3, 0]]) 
+
+Symbol: -sqrt(3)/3* s_1 + s_2   Expression: Matrix([[0, -sqrt(3)/3 - I], [-sqrt(3)/3 + I, 0]]) 
+
+-----------------------------------------------------
+2-th kp model:
+Matrix([[Bz, 0], [0, Bz]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+Bz
+
+Matrix basis:
+Symbol: s_0   Expression: Matrix([[1, 0], [0, 1]]) 
+
+-----------------------------------------------------
+3-th kp model:
+Matrix([[Bz, 0], [0, -Bz]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+Bz
+
+Matrix basis:
+Symbol: s_3   Expression: Matrix([[1, 0], [0, -1]]) 
+
+-----------------------------------------------------

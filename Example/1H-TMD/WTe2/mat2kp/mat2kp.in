@@ -1,0 +1,45 @@
+Symmetry = {
+
+'C3z' : {
+    'rotation_matrix': Matrix([[-Rational(1,2),-sqrt(3)/2,0],
+                                  [sqrt(3)/2, -Rational(1,2), 0],
+                                  [0, 0, 1]]),
+    'repr_matrix': Matrix([[-1,0],
+                              [0,Rational(1,2)+I*sqrt(3)/2]]),     
+    'repr_has_cc': False  
+},
+
+
+
+'Mz' : {
+    'rotation_matrix': Matrix([[1, 0, 0],
+                                  [0, 1, 0],
+                                  [0, 0, -1]]),
+    'repr_matrix': Matrix([[I,0],
+                              [0,-I]]),  
+    'repr_has_cc': False  
+},
+
+
+
+
+'MxT' : {
+    'rotation_matrix': Matrix([[-1, 0, 0],
+                                  [0, 1, 0],
+                                  [0, 0, 1]]),
+    'repr_matrix': Matrix([[-1,0],
+                              [0,Rational(1,2)-I*sqrt(3)/2]]),    
+    'repr_has_cc': True 
+}
+
+
+}
+
+vaspMAT = 'WTe2'
+
+
+order = 2        # Generate all kp models with order <= 3
+gfactor = 1     # Whether to compute Zeeman coupling.
+print_flag = 2  # The location of the output of the result
+log = 1         # Whether to output log files.
+

@@ -1,0 +1,38 @@
+SYSTEM=noscf
+ISTART = 1     
+ICHARG = 11    
+ENCUT=500
+PREC=Normal
+IBRION=-1    
+NSW=0        
+EDIFF=1E-8         
+ALGO=Normal      #Fast 
+LREAL = .FALSE.
+
+
+ISMEAR=0
+SIGMA=0.05     #0.03-0.05
+#ISMEAR=1     
+#SIGMA=0.2
+#ISMEAR=-5 
+
+LMAXMIX = 4
+LORBIT=11  
+
+ISYM=2  #0  -1  
+ISIF=2 
+
+
+#LVHAR=.TRUE.    #静电势
+LWAVE=.FALSE.  
+LCHARG=.FALSE. 
+
+NPAR=8
+#KPAR=2
+
+
+#SOC
+LSORBIT =.TRUE.
+MAGMOM = 9*0.0
+
+NBANDS=600

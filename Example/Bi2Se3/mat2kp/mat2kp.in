@@ -1,0 +1,51 @@
+Symmetry = {
+'C3z' : {
+'rotation_matrix': 
+Matrix([[-Rational(1,2), -sqrt(3)/2,0],
+[sqrt(3)/2, -Rational(1,2), 0],
+[0, 0, 1]]),
+'repr_matrix': 
+Matrix([[Rational(1,2)-I*sqrt(3)/2,0,0,0],
+[0,Rational(1,2)+I*sqrt(3)/2,0,0],
+[0,0,Rational(1,2)-I*sqrt(3)/2,0],
+[0,0,0,Rational(1,2)+I*sqrt(3)/2]]),
+'repr_has_cc': False},
+'C2x' : {
+'rotation_matrix': 
+Matrix([[1, 0, 0],
+[0, -1, 0],
+[0, 0, -1]]),
+'repr_matrix': 
+Matrix([[0,-Rational(1,2)-I*sqrt(3)/2,0,0],
+[Rational(1,2)-I*sqrt(3)/2,0,0,0],
+[0,0,0,-Rational(1,2)-I*sqrt(3)/2],
+[0,0,Rational(1,2)-I*sqrt(3)/2,0]]),    
+'repr_has_cc': False},
+'P' : {
+'rotation_matrix': 
+Matrix([[-1,0,0], 
+[0, -1, 0], 
+[0, 0, -1]]),
+'repr_matrix': 
+Matrix([[1,0,0,0],
+[0,1,0,0],
+[0,0,-1,0],
+[0,0,0,-1]]),   #GM8 9
+'repr_has_cc': False  
+},
+'T' : {
+'rotation_matrix': eye(3),       # Identity Matrix
+'repr_matrix': 
+Matrix([[0,1,0,0],
+[-1,0,0,0],
+[0,0,0,-1],
+[0,0,1,0]]),  #GM8 9
+    'repr_has_cc': True}
+}
+# optional parameters
+vaspMAT = 'Bi2Se3'
+order = 2        # Generate all kp models with order <= 3
+kpmodel = 1     # Whether to compute Zeeman coupling.
+gfactor = 1     # Whether to compute Zeeman coupling.
+print_flag = 2  # The location of the output of the result
+log = 1         # Whether to output log files.

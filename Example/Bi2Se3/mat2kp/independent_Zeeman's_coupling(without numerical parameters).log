@@ -1,0 +1,59 @@
+
+Print Zeeman's coupling results:
+==========  Result of Zeeman's coupling  ==========
+Number of independent kp models: 4
+-----------------------------------------------------
+1-th kp model:
+Matrix([[0, Bx - sqrt(3)*I*Bx/3 - sqrt(3)*By/3 - I*By, 0, 0], [Bx + sqrt(3)*I*Bx/3 - sqrt(3)*By/3 + I*By, 0, 0, 0], [0, 0, 0, Bx - sqrt(3)*I*Bx/3 - sqrt(3)*By/3 - I*By], [0, 0, Bx + sqrt(3)*I*Bx/3 - sqrt(3)*By/3 + I*By, 0]])
+Basis vector: [0, 1, sqrt(3)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -sqrt(3)/3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+Bx
+By
+
+Matrix basis:
+Symbol: Gamma_01 + sqrt(3)/3* Gamma_02   Expression: Matrix([[0, 1 - sqrt(3)*I/3, 0, 0], [1 + sqrt(3)*I/3, 0, 0, 0], [0, 0, 0, 1 - sqrt(3)*I/3], [0, 0, 1 + sqrt(3)*I/3, 0]]) 
+
+Symbol: -sqrt(3)/3* Gamma_01 + Gamma_02   Expression: Matrix([[0, -sqrt(3)/3 - I, 0, 0], [-sqrt(3)/3 + I, 0, 0, 0], [0, 0, 0, -sqrt(3)/3 - I], [0, 0, -sqrt(3)/3 + I, 0]]) 
+
+-----------------------------------------------------
+2-th kp model:
+Matrix([[0, Bx - sqrt(3)*I*Bx/3 - sqrt(3)*By/3 - I*By, 0, 0], [Bx + sqrt(3)*I*Bx/3 - sqrt(3)*By/3 + I*By, 0, 0, 0], [0, 0, 0, -Bx + sqrt(3)*I*Bx/3 + sqrt(3)*By/3 + I*By], [0, 0, -Bx - sqrt(3)*I*Bx/3 + sqrt(3)*By/3 - I*By, 0]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, sqrt(3)/3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -sqrt(3)/3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+Bx
+By
+
+Matrix basis:
+Symbol: Gamma_31 + sqrt(3)/3* Gamma_32   Expression: Matrix([[0, 1 - sqrt(3)*I/3, 0, 0], [1 + sqrt(3)*I/3, 0, 0, 0], [0, 0, 0, -1 + sqrt(3)*I/3], [0, 0, -1 - sqrt(3)*I/3, 0]]) 
+
+Symbol: -sqrt(3)/3* Gamma_31 + Gamma_32   Expression: Matrix([[0, -sqrt(3)/3 - I, 0, 0], [-sqrt(3)/3 + I, 0, 0, 0], [0, 0, 0, sqrt(3)/3 + I], [0, 0, sqrt(3)/3 - I, 0]]) 
+
+-----------------------------------------------------
+3-th kp model:
+Matrix([[Bz, 0, 0, 0], [0, -Bz, 0, 0], [0, 0, Bz, 0], [0, 0, 0, -Bz]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+Bz
+
+Matrix basis:
+Symbol: Gamma_03   Expression: Matrix([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, 1, 0], [0, 0, 0, -1]]) 
+
+-----------------------------------------------------
+4-th kp model:
+Matrix([[Bz, 0, 0, 0], [0, -Bz, 0, 0], [0, 0, -Bz, 0], [0, 0, 0, Bz]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+Bz
+
+Matrix basis:
+Symbol: Gamma_33   Expression: Matrix([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]) 
+
+-----------------------------------------------------

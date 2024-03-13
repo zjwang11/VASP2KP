@@ -1,0 +1,99 @@
+
+Print kp results:
+==========  Result of order = [0]  ==========
+Number of independent kp models: 2
+-----------------------------------------------------
+1-th kp model:
+Matrix([[1, 0], [0, 1]])
+Basis vector: [1, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+1
+
+Matrix basis:
+Symbol: s_0   Expression: Matrix([[1, 0], [0, 1]]) 
+
+-----------------------------------------------------
+2-th kp model:
+Matrix([[1, 0], [0, -1]])
+Basis vector: [0, 0, 0, 1]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+1
+
+Matrix basis:
+Symbol: s_3   Expression: Matrix([[1, 0], [0, -1]]) 
+
+-----------------------------------------------------
+
+==========  Result of order = [1]  ==========
+No symmetry-allowed kp models.
+
+==========  Result of order = [2]  ==========
+Number of independent kp models: 5
+-----------------------------------------------------
+1-th kp model:
+Matrix([[kx**2 + ky**2, 0], [0, kx**2 + ky**2]])
+Basis vector: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+kx**2 + ky**2
+
+Matrix basis:
+Symbol: s_0   Expression: Matrix([[1, 0], [0, 1]]) 
+
+-----------------------------------------------------
+2-th kp model:
+Matrix([[kx**2 + ky**2, 0], [0, -kx**2 - ky**2]])
+Basis vector: [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+kx**2 + ky**2
+
+Matrix basis:
+Symbol: s_3   Expression: Matrix([[1, 0], [0, -1]]) 
+
+-----------------------------------------------------
+3-th kp model:
+Matrix([[0, kx*kz - sqrt(3)*I*kx*kz/3 - sqrt(3)*ky*kz/3 - I*ky*kz], [kx*kz + sqrt(3)*I*kx*kz/3 - sqrt(3)*ky*kz/3 + I*ky*kz, 0]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, sqrt(3)/3, 0, 0, 0, 0, 0, 0, -sqrt(3)/3, 1, 0, 0, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+kx*kz
+ky*kz
+
+Matrix basis:
+Symbol: s_1 + sqrt(3)/3* s_2   Expression: Matrix([[0, 1 - sqrt(3)*I/3], [1 + sqrt(3)*I/3, 0]]) 
+
+Symbol: -sqrt(3)/3* s_1 + s_2   Expression: Matrix([[0, -sqrt(3)/3 - I], [-sqrt(3)/3 + I, 0]]) 
+
+-----------------------------------------------------
+4-th kp model:
+Matrix([[kz**2, 0], [0, kz**2]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+kz**2
+
+Matrix basis:
+Symbol: s_0   Expression: Matrix([[1, 0], [0, 1]]) 
+
+-----------------------------------------------------
+5-th kp model:
+Matrix([[kz**2, 0], [0, -kz**2]])
+Basis vector: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+
+Decomposed basis (not symmetric):
+Coefficient basis:
+kz**2
+
+Matrix basis:
+Symbol: s_3   Expression: Matrix([[1, 0], [0, -1]]) 
+
+-----------------------------------------------------

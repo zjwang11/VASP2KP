@@ -1,0 +1,10 @@
+Zeeman's coupling
+==========  Result of Zeeman's coupling  ==========
+mu_B/2*Matrix([[Bz*g3 + Bz*g4, g1*(Bx*(1 - sqrt(3)*I/3) + By*(-sqrt(3)/3 - I)) + g2*(Bx*(1 - sqrt(3)*I/3) + By*(-sqrt(3)/3 - I)), 0, 0], [g1*(Bx*(1 + sqrt(3)*I/3) + By*(-sqrt(3)/3 + I)) + g2*(Bx*(1 + sqrt(3)*I/3) + By*(-sqrt(3)/3 + I)), -Bz*g3 - Bz*g4, 0, 0], [0, 0, Bz*g3 - Bz*g4, g1*(Bx*(1 - sqrt(3)*I/3) + By*(-sqrt(3)/3 - I)) + g2*(Bx*(-1 + sqrt(3)*I/3) + By*(sqrt(3)/3 + I))], [0, 0, g1*(Bx*(1 + sqrt(3)*I/3) + By*(-sqrt(3)/3 + I)) + g2*(Bx*(-1 - sqrt(3)*I/3) + By*(sqrt(3)/3 - I)), -Bz*g3 + Bz*g4]])
+Parameters:
+g1 = -0.3244 ;
+g2 = 5.761 ;
+g3 = -7.8904 ;
+g4 = -13.0138 ;
+Error of the linear least square method: 6.11e-08
+Sum of absolute values of numerical zero elements: 4.12e-03
