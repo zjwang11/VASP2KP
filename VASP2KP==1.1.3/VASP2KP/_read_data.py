@@ -518,7 +518,11 @@ def load_data(Symmetry,vaspMAT,gfactor=1,repr_split = True, data_name_list=["Pi"
         
     
     
-    
+    if 'repr_matrix' not in list(Symmetry.values())[0].keys():
+        for i in Symmetry.keys():
+            Symmetry[i]['repr_matrix'] = bandreplist2rep(Symmetry[i]['band_repr_matrix_list'])
+            del Symmetry[i]['band_repr_matrix_list']
+            
     operator_name_list = Symmetry.keys()
     
     band_interest_set = get_interest_band_range(os.path.join(folder_path,"MAT_"+list(operator_name_list)[0]+'.m'))
@@ -545,7 +549,7 @@ def load_data(Symmetry,vaspMAT,gfactor=1,repr_split = True, data_name_list=["Pi"
         
         id_list = list(range(len(eigen_energy_interest)))
         id_list_ = id_list.copy()
- 
+        
         while len(id_list)!= 0:
             i = id_list[0]
             del id_list[0]
@@ -993,6 +997,7 @@ def load_data(Symmetry,vaspMAT,gfactor=1,repr_split = True, data_name_list=["Pi"
     else:
         print("Warning: No MAT_sig.m file! All spin matrices are set to zero!")
         data_name_list=["Pi"]
+        operator_name_list = list(operator_name_list)
         data = get_opertors_or_data(folder_path,data_name_list)
         data['sigx']=np.zeros_like(operator[operator_name_list[0]],dtype=np.complex128)
         data['sigy']=np.zeros_like(operator[operator_name_list[0]],dtype=np.complex128)
@@ -1000,7 +1005,6 @@ def load_data(Symmetry,vaspMAT,gfactor=1,repr_split = True, data_name_list=["Pi"
     
     
 
-                    
     #print("Finish loading data!")
     
     return operator,data,eigen_energy,band_interest_set,dim_list

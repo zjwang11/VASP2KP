@@ -215,14 +215,15 @@ if 'vaspMAT' not in locals_key:
 
 if print_flag == 0:
 
-    raise PrintFlagPatchError("Parameter print_flag is set to 0, there will be no output file! Please reset this parameter.")
+    #raise PrintFlagPatchError("Parameter print_flag is set to 0, there will be no output file! Please reset this parameter.")
+    print("Parameter print_flag is set to 0, there will be no output file! Please reset this parameter.")
     sys.exit()
 
 
 elif print_flag == 1:
     print(r"Warning!!! Parameter 'print_flag' is set to 1, all the result will be output on console, not into files!")
     
-    
+
 # calculate the result
 try:
     if no_vasp_kp:
@@ -234,7 +235,7 @@ try:
         get_std_kp_Zeeman(Symmetry, vaspMAT, kpmodel=kpmodel, order=order, gfactor=gfactor, print_flag=print_flag, log=log, acc=acc, repr_split = repr_split)
 
 except:
-    pass
+    print("The program unexpectedly encountered an error. We kindly ask you to send us a screenshot of the error and the input files. Email: zhangsheng221@mails.ucas.ac.cn/wzj@iphy.ac.cn")
 
 else:
     print("Congratulations! The computation of VASP2KP has finished!!!")
