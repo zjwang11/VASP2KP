@@ -87,9 +87,21 @@ with open('mat2kp.in', 'r') as file:
     input_inf = '\n'.join(input_list)
 
 
-
+try:
 # execute
-exec(input_inf)
+    exec(input_inf)
+except ValueError as ve:
+    if str(ve) == 'mismatched dimensions':
+        print("ERROR: At least one matrices in 'Symmetry' is not square matrix! Please check and rewrite it!")
+        sys.exit()
+    else:
+        print("An exception occurred:", ve)
+        print("ERROR: There are some typos in mat2kp.in. Please check!")
+        sys.exit()
+except Exception as e:
+    print("An exception occurred:", e)
+    print("ERROR: There are some typos in mat2kp.in. Please check!")
+    sys.exit()
 
 locals_key = list(locals().keys())
 locals_key_low = []
@@ -233,10 +245,18 @@ try:
     else:
         result_kp, result_Zeeman = \
         get_std_kp_Zeeman(Symmetry, vaspMAT, kpmodel=kpmodel, order=order, gfactor=gfactor, print_flag=print_flag, log=log, acc=acc, repr_split = repr_split)
-
-except:
+# except ValueError as ve:
+#     if ve == 'mismatched dimensions':
+#         print("ERROR: At least one matrices in 'Symmetry' is not square matrix! Please check and rewrite it!")
+#     else:
+#         print("An exception occurred:", ve)
+#         print("The program unexpectedly encountered an error. We kindly ask you to send us a screenshot of the error and the input files. Email: zhangsheng221@mails.ucas.ac.cn/wzj@iphy.ac.cn")
+#         sys.exit()
+    
+except Exception as e:
+    print("An exception occurred:", e)
     print("The program unexpectedly encountered an error. We kindly ask you to send us a screenshot of the error and the input files. Email: zhangsheng221@mails.ucas.ac.cn/wzj@iphy.ac.cn")
-
+    sys.exit()
 else:
     print("Congratulations! The computation of VASP2KP has finished!!!")
 
