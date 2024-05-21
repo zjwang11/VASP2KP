@@ -1073,14 +1073,14 @@ def get_Zeeman(Symmetry,msg_num,kvec,G_4c4,order = 0,print_flag = 2,log = 0):
     try:
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         np.complex
-        warnings.resetwarnings()
+        warnings.filterwarnings('default')
         
     except:
-        warnings.resetwarnings()
+        warnings.filterwarnings('default')
         np.complex = np.complex128
         
     # use kdotp-generator to generate the analytical Zeeman's coupling based on invariant theory
-    
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
     kpmodel, irrep_expr_basis, irrep_repr_basis = kp.symmetric_hamiltonian(
                 sym_ops,
                 kp_variable = 'B',
@@ -1089,7 +1089,8 @@ def get_Zeeman(Symmetry,msg_num,kvec,G_4c4,order = 0,print_flag = 2,log = 0):
                 msg_num = msg_num,
                 kvec = kvec
             )   
-    
+    warnings.filterwarnings('default')
+
     if print_flag == 2:
         sys.stdout = outfile
         
@@ -1693,10 +1694,10 @@ def get_std_kp(Symmetry,order,gfactor,msg_num,kvec,numeric_kp,print_flag=2,log =
     try:
         warnings.filterwarnings("ignore", category=DeprecationWarning)
         np.complex
-        warnings.resetwarnings()
+        warnings.filterwarnings('default')
         
     except:
-        warnings.resetwarnings()
+        warnings.filterwarnings('default')
         np.complex = np.complex128
     
     for order in order_list:
@@ -1708,6 +1709,7 @@ def get_std_kp(Symmetry,order,gfactor,msg_num,kvec,numeric_kp,print_flag=2,log =
         print('\n==========  Result of order = %s  =========='%(str(order)))
         
         # use kdotp-generator to generate the analytical kp hamiltonian based on invariant theory
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
         kpmodel, irrep_expr_basis, irrep_repr_basis = kp.symmetric_hamiltonian(
                 sym_ops,
                 kp_variable = 'k',
@@ -1716,7 +1718,7 @@ def get_std_kp(Symmetry,order,gfactor,msg_num,kvec,numeric_kp,print_flag=2,log =
                 msg_num = msg_num,
                 kvec = kvec
             )
-        
+        warnings.filterwarnings('default')
             
         
         if print_flag == 2:

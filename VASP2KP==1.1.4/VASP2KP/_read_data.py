@@ -413,6 +413,7 @@ def load_data(Symmetry,vaspMAT,gfactor=1,repr_split = True, data_name_list=["Pi"
             file = open(os.path.join(folder_path,"MAT_pi.m",'r'))
         except:
             print("ERROR: Cannot fild the file 'MAT_Pi.m'!")
+            sys.exit()
     file.readline()
     file.readline()
     kpoints = file.readline().strip().split(' ')
