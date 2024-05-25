@@ -21,7 +21,7 @@ README = """A tool for computing k.p effective Hamiltonians and Zeeman's couplin
 
 setup(name='VASP2KP',
       python_requires=">=3.6",
-      version = "1.1.4",
+      version = "1.1.5",
       long_description=README,
       install_requires=[
         'sympy', 'numpy', 'scipy', 'kdotp_generator'
