@@ -2,14 +2,15 @@
 
 ############################################################################################################
 # Patch Instructions
-# vasp2FS.6.4-patch-1.0.1.sh
+# vasp_FS.5.3-patch-1.0.1.sh
 # created by Sheng Zhang, Institute of Physics, Chinese Academy of Sciences
-# compile the script vasp2FS.6.4
-# step 1: copy the folder vasp.6.4 in the same folder as this script
-# step 2: create and revise makefile in vasp.6.4 so that vasp_ncl can be compiled successfully (no need to compile)
-# step 3: run this patch: bash vasp2FS.6.4-patch-1.0.1.sh
-# After these steps, wait a few miniutes and then if "Finishing installing vasp2FS!" is shown on the shell
-# then vasp2FS is compiled successfully.
+# compile the script vasp_FS.5.3
+# step 1: copy the folder vasp.5.3 and the folder vasp.5.lib in the same folder as this script
+# step 2: compile vasp.5.lib
+# step 3: create and revise makefile in vasp.5.3 so that vasp.5.3 can be compiled successfully (no need to compile)
+# step 4: run this patch: bash vasp_FS.5.3-patch-1.0.1.sh
+# After these steps, wait a few miniutes and then if "Finishing installing vasp_FS!" is shown on the shell
+# then vasp_FS is compiled successfully.
 ############################################################################################################
 
 # begin
@@ -241,8 +242,9 @@ EOF
 )
 
 mkpoints_full_rv1=$(cat <<EOF
-    REAL(q),ALLOCATABLE,SAVE :: KPOINTS_wzj(:,:)
-    INTEGER,ALLOCATABLE,SAVE :: KCHARTS_wzj(:)
+  REAL(q),ALLOCATABLE,SAVE :: KPOINTS_wzj(:,:)
+  INTEGER,ALLOCATABLE,SAVE :: KCHARTS_wzj(:)
+
 
 EOF
 )
@@ -315,15 +317,15 @@ EOF
 ##############################################################################
 # begin
 
-# judge if vasp2FS.6.4 already exists
-if [ -d "vasp2FS.6.4" ]; then
-    echo "The file folder 'vasp2FS.6.4' already exists, if you continue the installation, this folder will be deleted. Do you want to continue? [y/n]"
+# judge if vasp2FS.5.3 already exists
+if [ -d "vasp_FS.5.3" ]; then
+    echo "The file folder 'vasp_FS.5.3' already exists, if you continue the installation, this folder will be deleted. Do you want to continue? [y/n]"
     read flag
     while [ 0 ]; do
         if [ "$flag" == "n" ] || [ "$flag" == "N" ]; then
             exit
         elif [ "$flag" == "y" ] || [ "$flag" == "Y" ]; then
-            rm -rf vasp2FS.6.4
+            rm -rf vasp_FS.5.3
             break
         else
             read flag
@@ -332,20 +334,18 @@ if [ -d "vasp2FS.6.4" ]; then
 fi
 
 # prepare the files
-mkdir vasp2FS.6.4
-cd vasp2FS.6.4
+mkdir vasp_FS.5.3
+cd vasp_FS.5.3
 
-mkdir bin
-mkdir build
-cp ../vasp.6.4/makefile.include .
-cp -r ../vasp.6.4/src .
-
-cd src
-# create vp_fermi.f90
-echo "$vp_fermi_f90" > vp_fermi.f90
+ln -sf ../vasp.5.3/*.F ./
+ln -sf ../vasp.5.3/*.inc ./
 
 # revise mkpoints_full.F
-line_number=$(grep -n "LOGICAL :: LSKIP_IRREGULAR_POINTS" "mkpoints_full.F" | sed -n 's/^\([0-9]\+\):.*$/\1/p')
+unlink mkpoints_full.F
+cp ../vasp.5.3/mkpoints_full.F ./
+# create vp_fermi.f90
+echo "$vp_fermi_f90" > vp_fermi.f90
+line_number=$(grep -n "REAL(q),ALLOCATABLE,SAVE :: WEIGHT_K_POINT_PAIR_SMALL_GROUP(:,:)" "mkpoints_full.F" | sed -n 's/^\([0-9]\+\):.*$/\1/p')
 if [ -z "$line_number" ]; then
     echo "Error: cannot find the right line in mkpoints_full.F!!!"
     exit
@@ -375,52 +375,42 @@ if [ -z "$line_number" ]; then
     exit
 fi
 
-line_number=$(expr $line_number - 2)
+line_number=$(expr $line_number - 1)
 sed -i "${line_number}r /dev/stdin" mkpoints_full.F <<< "$mkpoints_full_rv3"
 
-cd ..
 
 # revise makefile
-if [ -e "../vasp.6.4/makefile" ]; then
+if [ -e "../vasp.5.3/makefile" ]; then
   makefile="makefile"
-elif [ -e "../vasp.6.4/Makefile" ]; then
+elif [ -e "../vasp.5.3/Makefile" ]; then
   makefile="Makefile"
 else
-  echo "File 'Makefile' not exists in vasp.6.4!"
+  echo "File 'Makefile' not exists in vasp.5.3!"
   exit
 fi
-cp ../vasp.6.4/$makefile ./
-
-line_number=$(grep -n -E '^[[:space:]]*all[[:space:]]*:' $makefile | sed -n 's/^\([0-9]\+\):.*$/\1/p')
-if [ -z "$line_number" ]; then
-    echo "Error: cannot find the right line in ${makefile}!!!"
-    exit
-fi
-
-sed -i "${line_number}s/.*/all: ncl  std/" $makefile
-
-line_number=$(grep -n "cp src" "$makefile" | sed -n 's/^\([0-9]\+\):.*$/\1/p')
+cp ../vasp.5.3/$makefile ./
+line_number=$(grep -n "makeparam:" "$makefile" | sed -n 's/^\([0-9]\+\):.*$/\1/p')
 if [ -z "$line_number" ]; then
     echo "Error: cannot find the right line in $makefile!!!"
     exit
 fi
 
-sed -i "${line_number}r /dev/stdin" $makefile <<< "$(echo -e "\tmv vp_fermi bin/.")"
-sed -i "${line_number}r /dev/stdin" $makefile <<< "$(echo -e "\tifort -o vp_fermi src/vp_fermi.f90")"
-sed -i "${line_number}r /dev/stdin" $makefile <<< "$(echo -e "\tif [ ! -d bin ]; then mkdir -p bin ; fi")"
+line_number=$(expr $line_number - 1)
+sed -i "${line_number}r /dev/stdin" $makefile <<< "$(printf '\t$(FCL) -o vp_fermi vp_fermi.f90')"
 
+sed -i 's/-o vasp \(.*\)/-o vasp_FS \1/' $makefile
 
-echo "Finish modifying vasp into vasp2FS!"
-echo "vasp2FS source file is in the file folder vasp2FS.6.4, do you want to compile it right now? [y/n]"
+echo "Finish modifying vasp into vasp_FS!"
+echo "vasp_FS source file is in the file folder vasp_FS.5.3, do you want to compile it right now? [y/n]"
 
-# ask if the user want to compile vasp2FS right now
+# ask if the user want to compile vasp_FS right now
 read flag_2
 while [ 0 ]; do
     if [ "$flag_2" == "n" ] || [ "$flag_2" == "N" ]; then
         cd ..
         exit
     elif [ "$flag_2" == "y" ] || [ "$flag_2" == "Y" ]; then
-        echo "Begin compiling vasp2FS!"
+        echo "Begin compiling vasp_FS!"
         break
     else
         read flag_2
@@ -428,29 +418,14 @@ while [ 0 ]; do
 done
 
 # begin compiling
-make all
+make
 
-# rename vasp to vasp2FS
-cd build/ncl
-mv vasp vasp_ncl_FS
-
-# rename vasp to vasp2FS
-cd ../
-cd std
-mv vasp vasp_std_FS
-
-cd ../../
-
-mv bin/vasp_ncl bin/vasp_ncl_FS
-mv bin/vasp_std bin/vasp_std_FS
-cd bin
-
-# path of the file folder of vasp2FS
+# path of the file folder of vasp_FS
 current_path=$(pwd)
 
 cd ..
 
 # print the path
 echo " "
-echo "Finishing installing vasp2FS!"
-echo "The path of vasp2FS: $current_path/vasp_ncl_FS (or $current_path/vasp_std_FS)"
+echo "Finishing installing vasp_FS!"
+echo "The path of vasp_FS: $current_path/vasp_FS"
