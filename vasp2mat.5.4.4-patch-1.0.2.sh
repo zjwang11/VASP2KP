@@ -2432,6 +2432,7 @@ paw_F=$(cat<<'EOF'
       USE meta
       USE setxcmeta
       USE hyperfine
+      use song_data     , only : POTAE_all,nosoc_inH    ! songzd 2015/03/25
       IMPLICIT NONE
 
       TYPE (type_info) T_INFO
@@ -2448,7 +2449,7 @@ paw_F=$(cat<<'EOF'
       LOGICAL  LCOREL     ! calculate accurate core level shifts
     ! local variables
       TYPE (potcar),POINTER:: PP
-      INTEGER NT,LYMAX,NI,NDIM,LMMAX,NIP,ISP,IBASE,IADD,ISIZE,K,ITMP,NCDIJ,LMAX
+      INTEGER NT,LYMAX,NI,NDIM,LMMAX,NIP,ISP,IBASE,IADD,ISIZE,K, ITMP,NCDIJ,LMAX
       INTEGER, EXTERNAL :: MAXL_AUG,MAXL1
       LOGICAL, EXTERNAL :: USEFOCK_CONTRIBUTION, USEFOCK_AE_ONECENTER
 ! automatic arrays crash on IBM and SGI (thank's to Lucian Anton NAG, Zhengji Zhao SGI)
@@ -2476,6 +2477,7 @@ paw_F=$(cat<<'EOF'
       REAL(q) :: DOUBLEC_LDAU, DOUBLEC_HF
       ! euler angles of the global spin quantisation axis
       REAL(q) :: ALPHA,BETA
+! #define robdeb
       INTEGER :: LMAX_TAU, LMMAX_TAU
       REAL(q),ALLOCATABLE :: TAUAE(:,:,:),TAUPS(:,:,:),MUAE(:,:,:),MUPS(:,:,:)
     ! kinetic energy density (true and Weizsaecker)
@@ -2486,39 +2488,29 @@ paw_F=$(cat<<'EOF'
       REAL(q) :: SPI2,TMP
       INTEGER II,RNMAX, RNMAX_CL
       INTEGER, EXTERNAL :: ONE_CENTER_NMAX_FOCKAE
-      REAL(q) :: EPAWPSM,EPAWPSG,EPAWAEM,EPAWAEG,EPAWCORE,EPAWCOREM
+#ifdef robdeb
+      REAL(q) :: KEDAE,KEDPS, KWDAE, KWDPS
+#endif
 ! variables required to store core wavefunctions
       INTEGER MAXNL
       REAL(q), ALLOCATABLE :: W(:,:), EIG(:)
       INTEGER, ALLOCATABLE :: N(:), LC(:)
-! needed to distribute over COMM_KINTER
-      INTEGER IDONE
-      LOGICAL LSKIP
-
-
-      PROFILING_START('set_dd_paw')
-
 !=======================================================================
 ! quick return and allocation of work space
 !=======================================================================
 
-      E%PAWPSM=0; E%PAWAEM=0; E%PAWCORE=0
-      E%PAWPSG=0; E%PAWAEG=0; E%PAWCOREM=0
-
       DOUBLEC_AE=0
       DOUBLEC_PS=0
-
-      EPAWPSM=0; EPAWAEM=0; EPAWCORE=0
-      EPAWPSG=0; EPAWAEG=0; EPAWCOREM=0
+      E%PAWPSM=0; E%PAWAEM=0
+      E%PAWPSG=0; E%PAWAEG=0
+      E%PAWCORE=0
+      E%PAWCOREM=0
 
       CL_SHIFT= 0
 
       NULLIFY(NULPOINTER)
 
-      IF (.NOT.LOVERL) THEN
-         PROFILING_STOP('set_dd_paw')
-         RETURN
-      ENDIF
+      IF (.NOT.LOVERL) RETURN
 
 ! mimic US-PP just set the double counting corrections correctly
       IF (MIMIC_US) THEN
@@ -2527,8 +2519,6 @@ paw_F=$(cat<<'EOF'
 
          E%PAWAE=DOUBLEC_AE
          E%PAWPS=DOUBLEC_PS
-
-         PROFILING_STOP('set_dd_paw')
          RETURN
       ENDIF
 
@@ -2543,10 +2533,7 @@ paw_F=$(cat<<'EOF'
          END IF
       ENDDO
 
-      IF (NDIM == 0) THEN
-         PROFILING_STOP('set_dd_paw')
-         RETURN
-      ENDIF
+      IF (NDIM == 0) RETURN
 
       IF (LUSE_THOMAS_FERMI) CALL PUSH_XC_TYPE(LEXCH, LDAX, ALDAC, AGGAX, AGGAC, 0.0_q)
 
@@ -2560,6 +2547,7 @@ paw_F=$(cat<<'EOF'
 
       ALLOCATE ( POT( NDIM, LMMAX, NCDIJ ), RHO( NDIM, LMMAX, NCDIJ ), &
      &   POTAE( NDIM, LMMAX, NCDIJ ), RHOAE( NDIM, LMMAX, NCDIJ), DRHOCORE(NDIM))
+      ALLOCATE ( POTAE_all( NDIM, LMMAX, NCDIJ, T_INFO%NIONS  ) )       ! songzd 2015/3/25
       ALLOCATE (RHOCOL( NDIM, LMMAX, NCDIJ ))
 #ifdef noAugXCmeta
       ALLOCATE(RHOPS_STORE(NDIM,LMMAX,NCDIJ),POTH(NDIM,LMMAX,NCDIJ))
@@ -2576,24 +2564,13 @@ paw_F=$(cat<<'EOF'
 !=======================================================================
 ! cycle all ions and add corrections to pseudopotential strength CDIJ
 !=======================================================================
-      IBASE=1; IDONE=0
-
+      IBASE=1
 
       ion: DO NI=1,T_INFO%NIONS
          NIP=NI_LOCAL(NI, WDES%COMM_INB) ! local storage index
          NT=T_INFO%ITYP(NI)
-
-         LSKIP=.FALSE.
-#ifdef MPI
-         ! DO_LOCAL represents a distribution of the work on the
-         ! one-center terms over the procs in COMM_INB and COMM_INTER (=COMM_KIN).
-         ! The following allows an additional round-robin distribution over COMM_KINTER as well.
-         IF (DO_LOCAL(NI)) THEN
-            IDONE=IDONE+1; LSKIP=(MOD(IDONE,WDES%COMM_KINTER%NCPU)+1/=WDES%COMM_KINTER%NODE_ME)
-         ENDIF
-#endif
-         ! if this element is not treated locally CYCLE
-         IF (.NOT. DO_LOCAL(NI).OR.LSKIP) THEN
+      ! if this element is not treated locally CYCLE
+         IF (.NOT. DO_LOCAL(NI)) THEN
             ! for PAW, set CDIJ to zero if it resides on local node
             ! and if the element is not treated locally
             IF (ASSOCIATED(P(NT)%QPAW)) THEN
@@ -2606,17 +2583,12 @@ paw_F=$(cat<<'EOF'
             ! US PP: initialize to zero if we are not on first node in COMM_INTER
             ! (at the end, we use a global sum over COMM_INTER) 
 #ifdef MPI
-               IF (WDES%COMM_INTER%NODE_ME*WDES%COMM_KINTER%NODE_ME /=1 .AND. NIP /=0 ) THEN
+               IF (WDES%COMM_INTER%NODE_ME /=1 .AND. NIP /=0 ) THEN
                   DO ISP=1,NCDIJ
                      CDIJ(:,:,NIP,ISP)=0
                   ENDDO
                ENDIF
 #endif
-            ENDIF
-            ! in case we skip work on this ion, we still have to advance IBASE
-            IF (LSKIP) THEN
-               PP=> PP_POINTER(P, NI, NT)
-               IBASE=IBASE+COUNT_RHO_PAW_ELEMENTS(PP)
             ENDIF
             CYCLE ion
          ENDIF
@@ -2626,9 +2598,6 @@ paw_F=$(cat<<'EOF'
          CALL SET_CMBJ_RAD(NT)
 
          PP=> PP_POINTER(P, NI, NT)
-         CALL SET_RSGF_TYPE(NT)
-!        CALL SET_RSGF_SIMPLE(PP)
-
          LYMAX =MAXL1(PP)*2
          RNMAX =PP%R%NMAX
 
@@ -2757,20 +2726,58 @@ paw_F=$(cat<<'EOF'
   ! now finish the meta GGA stuff
   !-----------------------------------------------------------------------
             IF ( LMETA ) THEN
-            ! calculate E(xc) for meta-GGA
-!              CALL RAD_META_GGA(PP%R, ISPIN, LYMAX, PP%LMAX_CALC, &
-!                   RHO, PP%RHOPS, POT,KINDENSPS,WKDPS,EXCM)
+   ! output of kinetic energy density
+#ifdef robdeb
+               IF (ISPIN==1) THEN
+                  CALL SIMPI(PP%R,KINDENSAE(:,1),KEDAE)
+                  CALL SIMPI(PP%R,KINDENSPS(:,1),KEDPS)
+                  CALL SIMPI(PP%R,WKDAE(:,1),KWDAE)
+                  CALL SIMPI(PP%R,WKDPS(:,1),KWDPS)
+                  WRITE(*,4711) NI,NT,KEDAE*SPI2,KEDPS*SPI2, &
+                       KWDAE*SPI2,KWDPS*SPI2
+4711              FORMAT(' Atom: ',I4,' Type: ',I4, /&
+                       &        ' KEDAE: ',F16.6,' KEDPS: ',F16.6, /&
+                       &        ' KWDAE: ',F16.6,' KWDPS: ',F16.6)
+               ELSE
+                  CALL SIMPI(PP%R,KINDENSAE(:,1),KEDAE)
+                  CALL SIMPI(PP%R,KINDENSPS(:,1),KEDPS)
+                  CALL SIMPI(PP%R,WKDAE(:,1),KWDAE)
+                  CALL SIMPI(PP%R,WKDPS(:,1),KWDPS)
+                  WRITE(*,4712) NI,NT,1,KEDAE*SPI2,KEDPS*SPI2, &
+                       KWDAE*SPI2,KWDPS*SPI2
+                  CALL SIMPI(PP%R,KINDENSAE(:,2),KEDAE)
+                  CALL SIMPI(PP%R,KINDENSPS(:,2),KEDPS)
+                  CALL SIMPI(PP%R,WKDAE(:,2),KWDAE)
+                  CALL SIMPI(PP%R,WKDPS(:,2),KWDPS)
+                  WRITE(*,4712) NI,NT,2,KEDAE*SPI2,KEDPS*SPI2, &
+                       KWDAE*SPI2,KWDPS*SPI2
+4712              FORMAT(' Atom: ',I4,' Type: ',I4,' Spin: ',I4 /&
+                       &        ' KEDAE: ',F16.6,' KEDPS: ',F16.6, /&
+                       &        ' KWDAE: ',F16.6,' KWDPS: ',F16.6)
+               ENDIF
+
+#endif
+
+      ! calculate E(xc) for meta-GGA
+!               CALL RAD_META_GGA(PP%R, ISPIN, LYMAX, PP%LMAX_CALC, &
+!                    RHO, PP%RHOPS, POT,KINDENSPS,WKDPS,EXCM)
                CALL RAD_META_GGA_ASPH(PP%R, ISPIN, LYMAX, PP%LMAX_CALC, &
                     RHO, PP%RHOPS, POT,KINDENSPS,WKDPS,EXCM)
                E%PAWPSM=E%PAWPSM-EXCM
-!              CALL RAD_META_GGA(PP%R, ISPIN, LYMAX, PP%LMAX_CALC, &
-!                   RHOAE, PP%RHOAE, POTAE,KINDENSAE,WKDAE,EXCM)
+!               CALL RAD_META_GGA(PP%R, ISPIN, LYMAX, PP%LMAX_CALC, &
+!                    RHOAE, PP%RHOAE, POTAE,KINDENSAE,WKDAE,EXCM)
                CALL RAD_META_GGA_ASPH(PP%R, ISPIN, LYMAX, PP%LMAX_CALC, &
                     RHOAE, PP%RHOAE, POTAE,KINDENSAE,WKDAE,EXCM)
-
-               EPAWAEM=EPAWAEM+EXCM-PP%DEXCCOREM
-               EPAWCOREM=EPAWCOREM+PP%DEXCCOREM
+               E%PAWAEM=E%PAWAEM+EXCM-PP%DEXCCOREM
+               E%PAWCOREM=E%PAWCOREM+PP%DEXCCOREM
+#ifdef robdeb
+               WRITE(*,*) '--------------------------------------------------------'
+               WRITE(*,*) 'Exc radial grid:'
+               WRITE(*,'(2(A,F16.6))') ' AE: ',E%PAWAEM,' PS: ',E%PAWPSM
+               WRITE(*,*) '--------------------------------------------------------'
+#endif 
             ENDIF
+#undef robdeb
 
          CALL EGRAD_EFG_RAD_HAR_ONLY(T_INFO,NI,PP,RHO,RHOAE)
   !-----------------------------------------------------------------------
@@ -2806,8 +2813,7 @@ paw_F=$(cat<<'EOF'
             CALL RAD_POT_METAGGA( PP%R, 2, PP%LMAX_CALC, LMAX_TAU, LASPH,  &
                RHOCOL, RHOPS_STORE, PP%RHOPS, PP%POTPS, KINDENSCOL, POTH, POT, DOUBLEPS, EXCG, MUPS, PP%TAUPS)
 
-            EPAWPSG=EPAWPSG-EXCG
-
+            E%PAWPSG=E%PAWPSG-EXCG
             CALL RAD_MAG_DIRECTION( RHO, RHOCOL, POT, LYMAX, PP%R)
 #ifdef noAugXCmeta
             CALL RAD_MAG_DIRECTION( RHO, RHOCOL, POTH, LYMAX, PP%R)
@@ -2830,14 +2836,13 @@ paw_F=$(cat<<'EOF'
 
             CALL RESTORE_ONE_CENTER_AEXX
 
-            EPAWAEG=EPAWAEG+EXCG-PP%DEXCCORE
-            EPAWCORE=EPAWCORE+PP%DEXCCORE
-
+            E%PAWAEG=E%PAWAEG+EXCG-PP%DEXCCORE
+            E%PAWCORE=E%PAWCORE+PP%DEXCCORE
             CALL RAD_MAG_DIRECTION( RHOAE, RHOCOL, POTAE, LYMAX, PP%R)
 
             CALL RAD_MAG_DIRECTION_KINDENS( RHOAE, TAUAE, LMAX_TAU, POTAE, MUAE, PP%R)
 
-            IF (WDES%LSORBIT) &
+            IF (WDES%LSORBIT .and. (.not. nosoc_inH) ) &
               CALL SPINORB_STRENGTH(POTAE(:,1,1), PP%RHOAE, PP%POTAE_XCUPDATED, PP%R, CSO, &
                 PP%LMAX, PP%LPS ,PP%WAE, PP%ZCORE+PP%ZVALF_ORIG, THETA=BETA, PHI=ALPHA)
 
@@ -2865,7 +2870,7 @@ paw_F=$(cat<<'EOF'
             CALL ADD_CL_HARTREE_POT(DRHOCORE, NT, ISPIN, POT, PP%R)
             !CALL RAD_POT_HAR_ONLY( PP%R, ISPIN, LYMAX, PP%LMAX_CALC,RHOCOL,  POT, DOUBLEPS)
 
-            EPAWPSG=EPAWPSG-EXCG
+            E%PAWPSG=E%PAWPSG-EXCG
 
             DRHOCORE=0
             
@@ -2890,9 +2895,12 @@ paw_F=$(cat<<'EOF'
 
             !CALL RAD_POT_HAR_ONLY( PP%R, ISPIN, LYMAX, PP%LMAX_CALC,RHOCOL,  POTAE, DOUBLEAE)
 
-            EPAWAEG=EPAWAEG+EXCG-PP%DEXCCORE
-            EPAWCORE=EPAWCORE+PP%DEXCCORE
+
+            E%PAWAEG=E%PAWAEG+EXCG-PP%DEXCCORE
+            E%PAWCORE=E%PAWCORE+PP%DEXCCORE
          ENDIF
+
+         POTAE_all(:,:,:,NIP) = POTAE(:,:,:)     ! songzd 2015/03/25
 
          DOUBLEC_PS= DOUBLEC_PS-DOUBLEPS*T_INFO%VCA(NT)
          ! the core-core exchange correlation energy is included
@@ -3061,36 +3069,26 @@ paw_F=$(cat<<'EOF'
          CDIJ(:,:,NIP,:)=CDIJ(:,:,NIP,:)+(CTMP+CSO+CHF+CMETAGGA)*T_INFO%VCA(NT)
 
          DEALLOCATE(TAUAE,TAUPS,MUAE,MUPS,KINDENSCOL)
-         CALL UNSET_RSGF_TYPE
-         ! we can deallocate the calculated range-separated Greens functions here,
-         ! which means that these kernels are recalculated for each ion 
-         CALL DEALLOCATE_RSGF
       ENDDO ion
-      ! or we could deallocate here, which means that the Greens functions are
-      ! only thrown away after SET_DD_PAW has finished completely
 !=======================================================================
 ! now distribute the DIJ to all nodes which hold DIJ (using global sum)
 !=======================================================================
 #ifdef realmode
       CALLMPI( M_sum_d(WDES%COMM_INTER, CDIJ, LMDIM*LMDIM*WDES%NIONS*NCDIJ))
-      CALLMPI( M_sum_d(WDES%COMM_KINTER,CDIJ, LMDIM*LMDIM*WDES%NIONS*NCDIJ))
 #else
       CALLMPI( M_sum_d(WDES%COMM_INTER, CDIJ, LMDIM*LMDIM*WDES%NIONS*NCDIJ*2))
-      CALLMPI( M_sum_d(WDES%COMM_KINTER,CDIJ, LMDIM*LMDIM*WDES%NIONS*NCDIJ*2))
 #endif
-      CALLMPI( M_sum_d(WDES%COMM, CL_SHIFT, SIZE(CL_SHIFT)))
+      CALLMPI( M_sum_d(WDES%COMM_KIN, CL_SHIFT, SIZE(CL_SHIFT)))
 
-      CALLMPI( M_sum_d(WDES%COMM, DOUBLEC_AE, 1))
-      CALLMPI( M_sum_d(WDES%COMM, DOUBLEC_PS, 1))
-
-      CALLMPI( M_sum_d(WDES%COMM, EPAWPSG, 1))
-      CALLMPI( M_sum_d(WDES%COMM, EPAWAEG, 1))
-      CALLMPI( M_sum_d(WDES%COMM, EPAWCORE, 1))
-
+      CALLMPI( M_sum_d(WDES%COMM_KIN, DOUBLEC_AE, 1))
+      CALLMPI( M_sum_d(WDES%COMM_KIN, DOUBLEC_PS, 1))
+      CALLMPI( M_sum_d(WDES%COMM_KIN, E%PAWPSG, 1))
+      CALLMPI( M_sum_d(WDES%COMM_KIN, E%PAWAEG, 1))
+      CALLMPI( M_sum_d(WDES%COMM_KIN, E%PAWCORE, 1))
       IF ( LMETA ) THEN
-         CALLMPI( M_sum_d(WDES%COMM, EPAWPSM, 1))
-         CALLMPI( M_sum_d(WDES%COMM, EPAWAEM, 1))
-         CALLMPI( M_sum_d(WDES%COMM, EPAWCOREM, 1))
+         CALLMPI( M_sum_d(WDES%COMM_KIN, E%PAWPSM, 1))
+         CALLMPI( M_sum_d(WDES%COMM_KIN, E%PAWAEM, 1))
+         CALLMPI( M_sum_d(WDES%COMM_KIN, E%PAWCOREM, 1))
       ENDIF
 #ifdef debug
       DO K=1,WDES%COMM%NCPU
@@ -3117,19 +3115,9 @@ paw_F=$(cat<<'EOF'
       E%PAWAE=DOUBLEC_AE
       E%PAWPS=DOUBLEC_PS
 
-      E%PAWPSG  =EPAWPSG
-      E%PAWAEG  =EPAWAEG
-      E%PAWPSM  =EPAWPSM
-      E%PAWAEM  =EPAWAEM
-      E%PAWCORE =EPAWCORE
-      E%PAWCOREM=EPAWCOREM
-
       IF (LUSE_THOMAS_FERMI) CALL POP_XC_TYPE
 
       CALL RELEASE_PAWFOCK
-
-      PROFILING_STOP('set_dd_paw')
-
     END SUBROUTINE SET_DD_PAW_song
 EOF
 )
@@ -3353,7 +3341,7 @@ relativistic_F=$(cat<<"EOF"
 !     this one contains essentially valence only contributions
       APOT=APOT-POTVAL
 !     finally add the current potential (average spin up and down)
-      APOT=APOT+POT* SCALE
+      APOT=APOT+POT(1:SIZE(APOT))* SCALE
 !     gradient
       CALL GRAD(R,APOT,DPOT)   ! now DPOT are in unit eV/A
       !
@@ -3466,7 +3454,7 @@ relativistic_F=$(cat<<"EOF"
 !     this one contains essentially valence only contributions
       APOT=APOT-POTVAL
 !     finally add the current potential (average spin up and down)
-      APOT=APOT+POT* SCALE
+      APOT=APOT+POT(1:SIZE(APOT))* SCALE
 !     gradient
       CALL GRAD(R,APOT,DPOT)   ! now DPOT are in unit eV/A
       !
